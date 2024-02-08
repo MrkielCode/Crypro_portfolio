@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% block content %}
+<!-- General info -->
+<section class="container" id="general-info">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md text-center box-container mt-5">
+        <p class="marketcap-info">$19282223</p>
+        <h4>Bitcoin</h4>
+      </div>
+      <div class="col-md text-center box-container mt-5 ml-md-3 mr-md-3">
+        <p class="marketcap-info">$77222</p>
+        <h4>Etheruem</h4>
+      </div>
+      <div class="col-md text-center box-container mt-5">
+        <p class="marketcap-info">$234433</p>
+        <h4>BNB</h4>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+ <!-- End of General info -->
+
+<section class="container mt-5 mb-5">
+  <div class="row">
+    <div class="col text-center">
+      <h3 class="text-header"><i class="fa-solid fa-coins"></i>   Cryptocurrencies</h3>
+    </div>
+  </div>
+</section>
+
+<!-- Price info -->
+<section class="container" id="price-info">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Coin</th>
+        <th scope="col text">Price</th>
+        <th scope="col">Market Cap</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">1</th>
+        <td>Bitcoin BTC</td>
+        <td>$43,040.34</td>
+        <td>$15,994,589,768	</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+<!-- End of Price info -->
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+{% block content %}
+<!-- General info -->
+<section class="container" id="general-info">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md text-center box-container mt-5">
+          <p class="marketcap-info">$19282223</p>
+          <h4>Total balance</h4>
+        </div>
+        <div class="col-md text-center box-container mt-5 ml-md-3">
+          <p class="marketcap-info">$77222 <span>50%</span></p>
+          <h4>Profit/Loss</h4>
+        </div>
+      </div>
+      </div>
+    </div>
+</section>
+<!-- End of General info -->
+
+<section class="container mt-5 mb-5">
+    <div class="row">
+      <div class="col text-center">
+        <h3 class="text-header"><i class="fa fa-solid fa-briefcase"></i> Porfolio</h3>
+      </div>
+    </div>
+    <div class="row justify-content-end mr-1">
+        <a class="btn btn-success" href="#">Add Coin</a>
+    </div>
+</section>
+<!-- Porfolio info -->
+<section class="container" id="price-info">
+    <div class="table-responsive-sm">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Coin</th>
+          <th scope="col text">Price</th>
+          <th scope="col">Mkt Cap</th>
+          <th scope="col">PNL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>Bitcoin BTC</td>
+          <td>$43,040.34</td>
+          <td>$15,994,589,768	</td>
+          <td>45%</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+  <!-- End of Portfolio info --> 
+{% endblock content %}

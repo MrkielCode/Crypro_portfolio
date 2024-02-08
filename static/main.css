@@ -1,0 +1,52 @@
+/* General format */
+*{
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+}
+
+/* .text-header{
+  color: #514b51;
+} */
+/* Navbar */
+ .navbar-custom {
+    background-color: #800080;
+  }
+  .navbar-custom .navbar-brand,
+  .navbar-custom .navbar-nav .nav-link {
+    color: #fff;
+  }
+  .navbar-custom .navbar-toggler-icon {
+    background-color: #fff; 
+  }
+
+  .navbar-custom .navbar-nav .nav-item.active .nav-link,
+  .navbar-custom .navbar-nav .nav-item.active .nav-link:hover {
+    color: #fff;
+  }
+
+  .navbar-custom .navbar-nav .nav-item .nav-link:hover {
+    color: #ccc;
+  }
+
+  /* End of navbar */
+
+  /* General info */
+  .box-container{
+    background-color: #fff;
+    padding: 1rem;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .marketcap-info{
+    color: rgb(49, 137, 49);
+    font-size: 22px;
+    font-weight: 500px;
+  }
+  /* End of general info */
+
+  .fa-coins,  .fa-briefcase {
+    color: purple;
+    font-size: 2rem;
+  }
