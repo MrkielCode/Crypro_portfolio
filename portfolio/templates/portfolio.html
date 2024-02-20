@@ -1,0 +1,155 @@
+{% extends 'layout.html' %}
+{% block content %}
+<!-- General info -->
+<section class="container" id="portfolio">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md text-center box-container mt-5">
+          <p class="marketcap-info">${{ total_balance.total_balance }}</p>
+          <h4>Total balance</h4>
+        </div>
+        <div class="col-md text-center box-container mt-5 ml-md-3">
+          <p class="marketcap-info">${{total_profit_loss.total_profit_loss}} <span>( {{total_profit_loss.pnl_percentage}} %)</span></p>
+          <h4>Total Profit/Loss</h4>
+        </div>
+      </div>
+      </div>
+    </div>
+</section>
+<!-- End of General info -->
+
+<section class="container mt-5 mb-5">
+  <div class="row">
+    <div class="col text-center">
+      <h3 class="text-header"><i class="fa fa-solid fa-briefcase"></i> Portfolio</h3>
+    </div>
+  </div>
+  <div class="row justify-content-end mr-1">
+    <button class="btn btn-success" data-toggle="modal" data-target="#transactionModal">Add Transaction</button>
+  </div>
+</section>
+
+<!-- Modal for adding transaction -->
+<div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Add Transaction</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <form method="POST" action="add_transaction" id="transactionForm">
+            {{ form.hidden_tag() }}
+    
+            <div class="form-group">
+                {{ form.transaction_type.label(class="form-control-label") }}
+                {% if form.transaction_type.errors %}
+                    {{ form.transaction_type(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.transaction_type.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.transaction_type(class="form-control") }}
+                {% endif %}
+            </div>
+    
+            <div class="form-group">
+                {{ form.coin.label(class="form-control-label") }}
+                {% if form.coin.errors %}
+                    {{ form.coin(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.coin.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.coin(class="form-control") }}
+                {% endif %}
+            </div>
+    
+            <div class="form-group">
+                {{ form.cost.label(class="form-control-label") }}
+                {% if form.cost.errors %}
+                    {{ form.cost(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.cost.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.cost(class="form-control") }}
+                {% endif %}
+            </div>
+    
+            <div class="form-group">
+                {{ form.quantity.label(class="form-control-label") }}
+                {% if form.quantity.errors %}
+                    {{ form.quantity(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.quantity.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.quantity(class="form-control") }}
+                {% endif %}
+            </div>
+    
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    
+
+    </div>
+  </div>
+</div>
+
+<!-- Porfolio info -->
+<section class="container" id="portfolio-info">
+  <div class="table-responsive-sm">
+      <table class="table table-hover">
+          <thead>
+              <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Coin</th>
+                  <th scope="col">Total Cost</th>
+                  <th scope="col">Average Price Per Unit</th>
+                  <th scope="col">Total Quantity Bought</th>
+                  <th scope="col">Total Quantity Sold</th>
+                  <th scope="col">Current Value</th>
+                  <th scope="col">PNL</th>
+                  <th scope="col">PNL Percentage</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% if portfolio_data %}
+                  {% for asset_data in portfolio_data %}
+                      <tr>
+                          <td>{{ loop.index }}</td>
+                          <td>{{ asset_data['asset_name'] }}</td>
+                          <td>${{ asset_data['total_cost'] }}</td>
+                          <td>${{ asset_data['average_price_per_unit'] }}</td>
+                          <td>${{ asset_data['total_quantity_bought'] }}</td>
+                          <td>${{ asset_data['total_quantity_sold'] }}</td>
+                          <td>${{ asset_data['current_value'] }}</td>
+                          <td>${{ asset_data['pnl'] }}</td>
+                          <td>{{ asset_data['pnl_percentage'] }}%</td>
+                      </tr>
+                  {% endfor %}
+              {% endif %}
+          </tbody>
+      </table>
+  </div>
+</section>
+
+
+  <!-- End of Portfolio info --> 
+{% endblock content %}
