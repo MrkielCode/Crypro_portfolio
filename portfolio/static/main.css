@@ -39,7 +39,7 @@
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
   }
 
-  .marketcap-info{
+  .marketcap-info {
     color: rgb(49, 137, 49);
     font-size: 22px;
     font-weight: 500px;
@@ -58,8 +58,11 @@
   }
   /* End of general info */
 
- 
-
+  /* About section */
+  .about h2{
+    color: rgb(49, 137, 49);
+  }
+  /* About Section*/
 
   /* form */
   .form-section {

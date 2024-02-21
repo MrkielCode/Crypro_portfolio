@@ -5,11 +5,11 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md text-center box-container mt-5">
-          <p class="marketcap-info">${{ total_balance.total_balance }}</p>
+          <p class="marketcap-info">${{ total_balance }}</p>
           <h4>Total balance</h4>
         </div>
         <div class="col-md text-center box-container mt-5 ml-md-3">
-          <p class="marketcap-info">${{total_profit_loss.total_profit_loss}} <span>( {{total_profit_loss.pnl_percentage}} %)</span></p>
+          <p class="marketcap-info">${{ total_profit_loss_data.total_profit_loss }} <span>( {{ total_profit_loss_data.profit_loss_percentage }}%)</span></p>
           <h4>Total Profit/Loss</h4>
         </div>
       </div>
@@ -121,7 +121,7 @@
                   <th scope="col">#</th>
                   <th scope="col">Coin</th>
                   <th scope="col">Total Cost</th>
-                  <th scope="col">Average Price Per Unit</th>
+                  <!-- <th scope="col">Average Price Per Unit</th> -->
                   <th scope="col">Total Quantity Bought</th>
                   <th scope="col">Total Quantity Sold</th>
                   <th scope="col">Current Value</th>
@@ -136,7 +136,7 @@
                           <td>{{ loop.index }}</td>
                           <td>{{ asset_data['asset_name'] }}</td>
                           <td>${{ asset_data['total_cost'] }}</td>
-                          <td>${{ asset_data['average_price_per_unit'] }}</td>
+                          <!-- <td>${{ asset_data['average_price_per_unit'] }}</td> -->
                           <td>${{ asset_data['total_quantity_bought'] }}</td>
                           <td>${{ asset_data['total_quantity_sold'] }}</td>
                           <td>${{ asset_data['current_value'] }}</td>

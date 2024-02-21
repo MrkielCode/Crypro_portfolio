@@ -1,10 +1,120 @@
 #!/usr/bin/python3
-from flask import render_template, jsonify, flash, redirect, url_for, abort
+import json
+import os
+from datetime import datetime, timedelta
+from flask import render_template, jsonify, flash, redirect, url_for
 from portfolio import app, db, bcrypt
 from portfolio.forms import RegistrationForm, LoginForm, TransactionForm
 from portfolio.models import User, Transaction
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
+
+
+def get_current_price_from_file(asset_name):
+    """Get the current price from the saved JSON file."""
+    data = load_from_json()
+    if data and asset_name in data and 'usd' in data[asset_name]:
+        return float(data[asset_name]['usd'])
+    else:
+        return None
+
+def save_to_json(data):
+    """Save data to a JSON file."""
+    filename = 'price.json'
+
+    existing_data = load_from_json() or {}  # Load existing data or create an empty dictionary
+
+    # Update existing data only for keys that are not present
+    for key, value in data.items():
+        if key not in existing_data:
+            existing_data[key] = value
+
+    with open(filename, 'w') as file:
+        json.dump(existing_data, file)
+
+    print(f"Data saved to {filename}")
+
+def load_from_json():
+    """Load data from a JSON file."""
+    filename = 'price.json'
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            return json.load(file)
+    else:
+        return None
+
+def update_json_data_hourly():
+    """Update JSON file every hour."""
+    last_updated = load_last_updated_time()
+    
+    if not last_updated or datetime.now() - last_updated >= timedelta(hours=1):
+        # If the file is older than 1 hour or doesn't exist, update it
+        data = get_current_price()
+        if data:
+            save_to_json(data)
+            save_last_updated_time(datetime.now())
+            print("JSON file updated successfully")
+
+def save_last_updated_time(last_updated):
+    """Save the last update time to a JSON file."""
+    filename = 'last_updated.json'
+    with open(filename, 'w') as file:
+        json.dump(last_updated.isoformat(), file)
+
+def load_last_updated_time():
+    """Load the last update time from a JSON file."""
+    filename = 'last_updated.json'
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            return datetime.fromisoformat(json.load(file))
+    else:
+        return None
+    
+def get_total_current_balance(user_id):
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify(error="User not found")
+
+    transactions = user.transactions
+    total_balance = 0
+
+    for t in transactions:
+        current_price = get_current_price_from_file(t.asset_name)
+
+        if current_price and isinstance(current_price, float):
+            total_balance += current_price * t.quantity
+
+    return round(total_balance, 2)
+
+def get_total_profit_loss(user_id):
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify(error="User not found")
+
+    transactions = user.transactions
+    total_profit_loss = 0
+    total_cost = 0
+
+    for t in transactions:
+        if t.transaction_type == 1:
+            total_cost += t.cost
+        elif t.transaction_type == 2:
+            total_profit_loss += (get_current_price_from_file(t.asset_name) * t.quantity) - t.cost
+
+    total_value = get_total_current_balance(user_id)
+    total_profit_loss += total_value - total_cost
+
+    if total_cost == 0:
+        return {'total_profit_loss': 0, 'profit_loss_percentage': 0}
+
+    profit_loss_percentage = (total_profit_loss / total_cost) * 100
+
+    return {
+        'total_profit_loss': round(total_profit_loss, 2),
+        'profit_loss_percentage': round(profit_loss_percentage, 2)
+    }
 
 
 def get_crypto_data():
@@ -48,7 +158,7 @@ def get_crypto_data_ajax():
     return jsonify(cryptocurrencies)
 
 def get_current_price(asset_name):
-    """Get the current price of a specific asset."""
+    """Get the current price of a specific asset and save it to a JSON file."""
     api_url = f'https://api.coingecko.com/api/v3/simple/price?ids={asset_name}&vs_currencies=usd'
 
     try:
@@ -57,7 +167,8 @@ def get_current_price(asset_name):
 
         # Check if asset_name is present in the response data
         if asset_name in data and 'usd' in data[asset_name]:
-            return float(data[asset_name]['usd'])
+            # Save data to JSON file
+            save_to_json(data)
         else:
             print('Getting price failed: Asset not found or price data unavailable')
             return None
@@ -73,59 +184,6 @@ def get_average_price_per_unit(user_id, asset_name, transaction_type):
     total_cost = sum(t.cost for t in transactions)
 
     return total_cost / total_quantity if total_quantity != 0 else 0
-
-def get_total_current_balance(user_id):
-    user = User.query.get(user_id)
-
-    if not user:
-        return jsonify(error="User not found")
-
-    transactions = user.transactions
-    total_balance = 0
-
-    for asset_name in set(t.asset_name for t in transactions):
-        total_quantity_bought = sum(t.quantity for t in transactions if t.asset_name == asset_name and t.transaction_type == 1)
-        total_quantity_sold = sum(t.quantity for t in transactions if t.asset_name == asset_name and t.transaction_type == 2)
-        remaining_quantity = total_quantity_bought - total_quantity_sold
-
-        current_price = get_current_price(asset_name)
-
-        if current_price and isinstance(current_price, float):
-            remaining_value = current_price * remaining_quantity
-            total_balance += remaining_value
-
-    return [{'total_balance': round(total_balance, 2)}]
-
-def get_total_profit_loss(user_id):
-    user = User.query.get(user_id)
-
-    if not user:
-        return jsonify(error="User not found")
-
-    transactions = user.transactions
-    total_cost = 0
-    total_quantity_bought = 0
-    total_quantity_sold = 0
-
-    for asset_name in set(t.asset_name for t in transactions):
-        for t in transactions:
-            if t.asset_name == asset_name:
-                if t.transaction_type == 1:
-                    total_cost += t.cost
-                    total_quantity_bought += t.quantity
-                elif t.transaction_type == 2:
-                    total_quantity_sold += t.quantity
-
-    # Adjust total cost and quantity for sell transactions
-    selling_value = total_quantity_sold * get_average_price_per_unit(user_id, asset_name, 2)
-    total_cost -= selling_value
-    total_quantity_bought -= total_quantity_sold
-
-    current_value = get_total_current_balance(user_id)[0]['total_balance']
-    pnl = current_value - total_cost
-    pnl_percentage = (pnl / total_cost) * 100 if total_cost != 0 else 0
-
-    return [{'total_profit_loss': round(pnl, 2), 'pnl_percentage': round(pnl_percentage, 2)}]
 
 
 
@@ -156,7 +214,7 @@ def calculate_user_portfolio(user_id):
         total_cost -= selling_value
         total_quantity_bought -= total_quantity_sold
 
-        current_price = get_current_price(asset_name)
+        current_price = get_current_price_from_file(asset_name)
         if current_price and isinstance(current_price, float):
             total_current_value = current_price * total_quantity_bought
             pnl = total_current_value - total_cost
@@ -178,10 +236,28 @@ def calculate_user_portfolio(user_id):
     return assets
 
 
+def update_user_assets_prices(user_id):
+    """Update prices for all unique assets owned by a user."""
+    user = User.query.get(user_id)
+
+    if not user:
+        print("User not found")
+        return
+
+    transactions = user.transactions
+    unique_assets = set(t.asset_name for t in transactions)
+
+    for asset_name in unique_assets:
+        get_current_price(asset_name)
+
 @app.route('/')
 @app.route('/home')
 def home():
     return render_template('home.html', title='Home')
+
+@app.route('/about')
+def about():
+    return render_template('about.html', title='About')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -240,14 +316,20 @@ def add_transaction():
 def portfolio():
     form = TransactionForm()
     user_id = current_user.id
+    update_user_assets_prices(user_id)
+    
     total_balance = get_total_current_balance(user_id)
-    total_profit_loss = get_total_profit_loss(user_id)
+    total_profit_loss_data = get_total_profit_loss(user_id)
+    
     portfolio_data = calculate_user_portfolio(user_id)
+
     return render_template('portfolio.html',
                            title='Portfolio',
-                           form=form, portfolio_data=portfolio_data,
+                           form=form, 
+                           portfolio_data=portfolio_data,
                            total_balance=total_balance,
-                           total_profit_loss=total_profit_loss)
+                           total_profit_loss_data=total_profit_loss_data)
+
 
 @app.route("/logout")
 @login_required
