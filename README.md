@@ -48,3 +48,6 @@ The application utilizes the CoinGecko API to fetch real-time cryptocurrency mar
 ## Contributing
 
 Feel free to contribute to the project by opening issues or submitting pull requests. Bug reports, feature requests, and feedback are highly appreciated.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
