@@ -8,6 +8,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 class User(db.Model, UserMixin):
+    """ users tables """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -18,6 +19,7 @@ class User(db.Model, UserMixin):
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"
 
 class Transaction(db.Model):
+    """ Transactions table """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     asset_name = db.Column(db.String(20), nullable=False)

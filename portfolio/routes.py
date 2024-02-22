@@ -71,6 +71,7 @@ def load_last_updated_time():
         return None
     
 def get_total_current_balance(user_id):
+    """ Get current user balance """
     user = User.query.get(user_id)
 
     if not user:
@@ -88,6 +89,7 @@ def get_total_current_balance(user_id):
     return round(total_balance, 2)
 
 def get_total_profit_loss(user_id):
+    """ get total profit and loss of a user"""
     user = User.query.get(user_id)
 
     if not user:
@@ -177,6 +179,7 @@ def get_current_price(asset_name):
         return None
 
 def get_average_price_per_unit(user_id, asset_name, transaction_type):
+    """ Get average price of a token """
     user = User.query.get(user_id)
     transactions = [t for t in user.transactions if t.asset_name == asset_name and t.transaction_type == transaction_type]
     
@@ -188,6 +191,7 @@ def get_average_price_per_unit(user_id, asset_name, transaction_type):
 
 
 def calculate_user_portfolio(user_id):
+    """Calculation of user profile """
     user = User.query.get(user_id)
 
     if not user:
@@ -289,6 +293,7 @@ def register():
 @app.route('/portfolio/add_transaction', methods=['POST', 'GET'])
 @login_required
 def add_transaction():
+    """ Transactions route """
     form = TransactionForm()
 
     if form.validate_on_submit():
@@ -314,13 +319,13 @@ def add_transaction():
 @app.route('/portfolio/', methods=['GET', 'POST'])
 @login_required
 def portfolio():
+    """ portfolio routes """
     form = TransactionForm()
     user_id = current_user.id
+
     update_user_assets_prices(user_id)
-    
     total_balance = get_total_current_balance(user_id)
     total_profit_loss_data = get_total_profit_loss(user_id)
-    
     portfolio_data = calculate_user_portfolio(user_id)
 
     return render_template('portfolio.html',
